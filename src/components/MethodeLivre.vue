@@ -10,17 +10,17 @@ import RechercheLivre from "@/components/RechercheLivre.vue";
 const listeL = reactive([]);
 const rechercheL = reactive([]);
 
-// -- l'url de l'API
+// l'url de l'API
 const url = "https://webmmi.iut-tlse3.fr/~pecatte/librairies/public/28/livres";
 
 function ajouterQuantite(livre) {
   console.log(livre);
-  // -- ajouter la quantité
+  // ajouter la quantité
   livre.incrementer();
-  // -- entête http pour la req AJAX
+  // entête http pour la req AJAX
   let myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  // -- la chose modifiée est envoyé au serveur
+  // la quantité modifiée est envoyé au serveur
   //  via le body de la req AJAX
   const fetchOptions = {
     method: "PUT",
@@ -32,7 +32,7 @@ function ajouterQuantite(livre) {
       'prix': livre.prix
     }),
   };
-  // -- la req AJAX
+  // la requête AJAX
   fetch(url, fetchOptions)
       .then((response) => {
         return response.json();
@@ -44,14 +44,15 @@ function ajouterQuantite(livre) {
       })
       .catch((error) => console.log(error));
 }
+
 function enleverQuantite(livre) {
   console.log(livre);
-  // -- enlever la quantité
+  // enlever la quantité
   livre.decrementer();
-  // -- entête http pour la req AJAX
+  // entête http pour la req AJAX
   let myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  // -- la chose modifiée est envoyé au serveur
+  // la quantité modifiée est envoyé au serveur
   //  via le body de la req AJAX
   const fetchOptions = {
     method: "PUT",
@@ -63,14 +64,14 @@ function enleverQuantite(livre) {
       'prix': livre.prix
     }),
   };
-  // -- la req AJAX
+  // la requête AJAX
   fetch(url, fetchOptions)
       .then((response) => {
         return response.json();
       })
       .then((dataJSON) => {
         console.log(dataJSON);
-        if(livre.qtestock == 0){
+        if(livre.qtestock === 0){
           supprimerLivre(livre.id);
         }
         // actualiser la liste des livres
@@ -78,14 +79,14 @@ function enleverQuantite(livre) {
       })
       .catch((error) => console.log(error));
 }
-// -- handle pour supprimer un livre à partir de son id
+
+// supprimerLivre pour supprimer un livre à partir de son id
 function supprimerLivre(id) {
   console.log(id);
   const fetchOptions = {
     method: "DELETE",
   };
-  // -- l'id du livre à supprimer doit être
-  //  ajouté à la fin de l'url
+  // -- l'id du livre à supprimer doit être ajouté à la fin de l'url
   fetch(url + "/" + id, fetchOptions)
       .then((response) => {
         return response.json();
@@ -97,14 +98,15 @@ function supprimerLivre(id) {
       })
       .catch((error) => console.log(error));
 }
-// -- handle pour ajouter une nouveau livre à partir du libelle saisi dans le formulaire
+
+// ajouterLivre pour ajouter une nouveau livre à partir du formulaire de saisie
 function ajouterLivre(titre, qtestock, prix) {
   console.log(titre);
   console.log(qtestock);
   console.log(prix);
   let myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  // --  le libelle du nouveau livre est envoyé au serveur
+  // les données du nouveau livre sont envoyées au serveur
   //  via le body de la req AJAX
   const data = {titre: titre, qtestock: qtestock, prix: prix};
   const fetchOptions = {
@@ -122,8 +124,8 @@ function ajouterLivre(titre, qtestock, prix) {
       })
       .catch((error) => console.log(error));
 }
-// -- req AJAX pour récupérer les todos
-//    et les stocker dans le state listeL
+
+// requête AJAX pour récupérer les livres et les stocker dans la listeL
 function getLivres() {
   const fetchOptions = { method: "GET" };
   fetch(url, fetchOptions)
@@ -141,6 +143,7 @@ function getLivres() {
       })
       .catch((error) => console.log(error));
 }
+
 function rechercherLivre(motcle) {
   const fetchOptions = { method: "GET" };
   fetch(url + "?search=" + motcle, fetchOptions)
@@ -153,11 +156,12 @@ function rechercherLivre(motcle) {
         rechercheL.splice(0, rechercheL.length);
         // pour chaque donnée renvoyée par l'API
         //  créer un objet instance de la classe Livre
-        //  et l'ajouter dans la liste listeL
+        //  et l'ajouter dans la liste rechercheL
         dataJSON.forEach((v) => rechercheL.push(new Livre(v.id, v.titre, v.qtestock, v.prix)));
       })
       .catch((error) => console.log(error));
 }
+
 // -- fonction du cycle de vie du composant
 // exécutée 1 seule fois à la création
 onMounted(() => {
@@ -167,21 +171,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <h3>Liste des livres de la librairie (Vous pouvez également y rajouter un livre en remplissant le formulaire)</h3>
+  <h3>Ajoutez un elixir pour accroître les pouvoirs du Sorceleur </h3>
   <LivreForm @addL="ajouterLivre"></LivreForm>
   <ul>
-    <LivreItem
-        v-for="livre of listeL"
-        :key="livre.id"
-        :livre="livre"
-        @deleteL="supprimerLivre"
-        @addQ="ajouterQuantite"
-        @removeQ="enleverQuantite"
-    />
+    <div class="disposition">
+      <LivreItem
+          v-for="livre of listeL"
+          :key="livre.id"
+          :livre="livre"
+          @deleteL="supprimerLivre"
+          @addQ="ajouterQuantite"
+          @removeQ="enleverQuantite"
+      />
+    </div>
   </ul>
-  <h3>Rechercher un livre dans la librairie</h3>
+  <h3>Rechercher un elixir parmis la collection du Sorceleur</h3>
   <RechercheLivre @searchL="rechercherLivre"></RechercheLivre>
   <ul>
+    <div class="recheche-disposition">
     <LivreItem
         v-for="livre of rechercheL"
         :key="livre.id"
@@ -190,7 +197,40 @@ onMounted(() => {
         @addQ="ajouterQuantite"
         @removeQ="enleverQuantite"
     />
+    </div>
   </ul>
 </template>
+
 <style scoped>
+
+h3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  font-family: "The Witcher", Arial, sans-serif;
+  font-size: 20px;
+  color: #eee7e7;
+  text-align: center;
+  text-shadow: #988f8f 10px 5px 10px;
+  margin-top: 50px;
+}
+
+.disposition{
+  display: grid;
+  flex-direction: row;
+  flex-wrap: wrap;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  margin-top: 20px;
+}
+
+.recheche-disposition{
+  display: grid;
+  flex-direction: row;
+  flex-wrap: wrap;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  margin-top: 20px;
+}
+
 </style>

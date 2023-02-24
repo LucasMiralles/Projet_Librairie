@@ -33,7 +33,4 @@ export default class Livre {
     incrementer() {
         this._qtestock++;
     }
-    pourAfficher() {
-        return `Nous avons le livre "${this._titre}" en ${this._qtestock} exemplaires et à ${this._prix}e l'unité`;
-    }
 }
